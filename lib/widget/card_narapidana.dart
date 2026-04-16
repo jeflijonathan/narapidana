@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:narapidana/models/narapidana_model.dart';
+import 'package:narapidana/services/narapidana_service.dart';
+import '../screens/edit_narapidana_screen.dart';
 
 class NarapidanaCard extends StatelessWidget {
   final Narapidana data;
@@ -58,10 +60,68 @@ class NarapidanaCard extends StatelessWidget {
             ),
           ),
 
-          // ⚖️ ICON KASUS
-          const Icon(Icons.gavel, color: Colors.white),
+          // ⚙️ AKSI (Edit & Delete)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                tooltip: 'Edit',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditNarapidanaScreen(data: data),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.redAccent),
+                tooltip: 'Hapus',
+                onPressed: () {
+                  _showDeleteDialog(context);
+                },
+              ),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  // Menampilkan Dialog Konfirmasi Hapus
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Konfirmasi Hapus"),
+          content: Text("Apakah kamu yakin ingin menghapus data ${data.nama}?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Batal
+              child: const Text("Batal"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () async {
+                Navigator.pop(context); // Tutup dialog
+                await NarapidanaService().hapusData(data.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Data ${data.nama} berhasil dihapus"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

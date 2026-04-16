@@ -8,6 +8,14 @@ class NarapidanaService {
     await _db.push().set(data.toMap());
   }
 
+  Future<void> updateData(Narapidana data) async {
+    await _db.child(data.id).update(data.toMap());
+  }
+
+  Future<void> hapusData(String id) async {
+    await _db.child(id).remove();
+  }
+
   // Stream<List<Narapidana>> getData() {
   //   return _db.onValue.map((event) {
   //     final data = event.snapshot.value as Map?;
